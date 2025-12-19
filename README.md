@@ -27,7 +27,7 @@ Copy your fasta file to Automation_tool_scripts_*/Idpconfgenerator_automation di
 
 This step will generate five initial structures that you can find in the folder Automation_tool_scripts_*/Unst_prot
 
-You need to change line #SBATCH --account=project in file simulation_scripts/run_dir/md_prep_snakemake.sh manually!
+You need to change line #SBATCH --account=project in file simulation_scripts/run_dir/md_prep_snake.sh manually!
 Also change simulation specifications such as ion type, concentration, simulation length, tempreature etc. in Unst_prot/specifics.yaml.
 
 Copy Unst_prot, MD_parameter_files, simulation_scripts and env.yml to your project scratch in MAHTI/LUMI.
@@ -43,8 +43,11 @@ You can also copy relaxation times T1, T2 and hetNOE from https://bmrb.io/ and r
 Set up the environment:
  
 `module purge`
+
 `module load tykky`
+
 `mkdir env`
+
 `conda-containerize new --prefix env env.yml`
 
 
