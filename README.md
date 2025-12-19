@@ -53,7 +53,7 @@ You can select the project you want to use resources from when running the scrip
 
 Go to simulation_scripts/run_dir and run scripts in order:
 
-`sbatch run_prep_snakemake.sh` 
+`sbatch run_prep_snake.sh` 
 
 `sh run_batch_md.sh` 
 
