@@ -1,0 +1,16 @@
+# Simulation time in nanoseconds
+sim_time: 2000 
+
+# Reference temperature in Kelvin
+ref_temp: 303
+
+# Ionic concentration in mol/L
+conc: 0.01
+
+# Cation type and charge
+pos_ion_type: K
+pos_ion_charge: 1
+
+# Anion type and charge
+neg_ion_type: HPO4
+neg_ion_charge: -2

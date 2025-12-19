@@ -1,0 +1,4 @@
+[2025-11-26 13:31:47,485]cli_sscalc.py:idpconfgen:main:181: Reading Input Paths:
+[2025-11-26 13:31:47,895]cli_sscalc.py:idpconfgen:main:188:     done
+[2025-11-26 13:31:47,895]cli_sscalc.py:idpconfgen:main:190: Preparing Task Execution:
+[2025-11-26 13:31:59,245]cli.py:idpconfgen:maincli:143:     finished properly

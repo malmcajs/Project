@@ -1,0 +1,338 @@
+import os, re, glob, shutil, subprocess, yaml
+
+# --- Configurable parameters ---
+SYSTEM_PATH = os.getcwd()
+PROT_PATH = os.path.abspath(os.path.join(SYSTEM_PATH, "..", ".."))
+FORCEFIELD = SYSTEM_PATH.split("/")[-1]
+REPLICA = SYSTEM_PATH.split("/")[-2]
+parameters = os.path.abspath(os.path.join(PROT_PATH, "..", "MD_parameter_files"))
+configfile: os.path.join(PROT_PATH, "specifics.yaml")
+
+water_model = "tip4p"
+box_size = 1.5
+REF_TEMP = config["ref_temp"]
+
+SIM_TIME = config["sim_time"]
+CONC = config["conc"]
+POS_ION = config["pos_ion_type"] 
+NEG_ION = config["neg_ion_type"] 
+POS_Q = config["pos_ion_charge"] 
+NEG_Q = config["neg_ion_charge"]
+
+
+ion_map = {"Na":"SOD", "Cl":"CLA", "Cl2":"CLA", "Ca":"CAL", "K":"K", "K2":"K", "Mg":"MG", "HPO4":"HPO4"}
+
+rule all:
+    input:
+        f"md_{SIM_TIME}ns.tpr"
+
+rule prepare_mdps:
+    input:
+        em = f"{parameters}/{FORCEFIELD}/em.mdp",
+        nvt = f"{parameters}/{FORCEFIELD}/nvt.mdp",
+        npt = f"{parameters}/{FORCEFIELD}/npt.mdp",
+        template = f"{parameters}/{FORCEFIELD}/md_diff_sim_time/md_any_ns.mdp"
+    output:
+        em = "em.mdp",
+        nvt = "nvt.mdp",
+        npt = "npt.mdp",
+        md = f"md_{SIM_TIME}ns.mdp"
+    params:
+        sim_time = SIM_TIME,
+        ref_temp = REF_TEMP,
+        time_input = int(500000 * float(SIM_TIME))
+    run:
+        import os, re, shutil
+
+        # --- Copy base MDPs ---
+        shutil.copy(input.em, output.em)
+        shutil.copy(input.nvt, output.nvt)
+        shutil.copy(input.npt, output.npt)
+
+        # --- Prepare MD file from template ---
+        with open(input.template) as f:
+            content = f.read()
+        content = content.replace("time_input", str(params.time_input))
+        content = content.replace("sim_time", str(params.sim_time))
+        with open(output.md, "w") as f:
+            f.write(content)
+
+        # --- Update ref_t in all mdp files ---
+        for file in [output.em, output.nvt, output.npt, output.md]:
+            with open(file) as f:
+                lines = f.readlines()
+            with open(file, "w") as f:
+                for line in lines:
+                    f.write(re.sub(r"^\s*ref_t\s*=.*", f"ref_t = {params.ref_temp} {params.ref_temp}", line))
+
+        # --- Conditional CHARMM36M/HPO4 ion renaming ---
+        cwd = os.getcwd()
+        print(cwd)
+        if "CHARMM36M" in cwd or "HPO4" in cwd:
+            print(">> Adjusting ion naming for CHARMM36M/HPO4 case")
+
+            sim_folder = os.path.basename(os.path.dirname(os.path.dirname(cwd)))
+            parts = sim_folder.split("_")
+            if len(parts) > 1:
+                ion_formula = parts[-2]
+            else:
+                ion_formula = "Unknown"
+
+            ion_map = {
+                "Na": "SOD", "Cl": "CLA", "Cl2": "CLA",
+                "Ca": "CAL", "K": "K", "K2": "K",
+                "Mg": "MG", "HPO4": "HPO4"
+            }
+
+            def expand_formula(formula):
+                special_ions = ["HPO4", "SO4", "NO3", "PO4"]
+                ions = []
+                remaining = formula
+                for ion in special_ions:
+                    match = re.search(rf"({ion})(\d*)", remaining)
+                    if match:
+                        ions.append(ion)
+                        remaining = remaining.replace(match.group(0), "", 1)
+                tokens = re.findall(r"([A-Z][a-z]*)(\d*)", remaining)
+                for el, _ in tokens:
+                    ions.append(el)
+                return ions
+
+            ions = expand_formula(ion_formula)
+            cation = ions[0] if ions else "UNK"
+            anions = ions[1:]
+            cation_charmm = ion_map.get(cation, cation)
+            anions_charmm = [ion_map.get(a, a) for a in anions]
+            ion_line = " ".join([cation_charmm] + anions_charmm)
+
+            mdp_file = f"md_{params.sim_time}ns.mdp"
+            with open(mdp_file, "r") as f:
+                lines = f.readlines()
+            with open(mdp_file, "w") as f:
+                for line in lines:
+                    f.write(re.sub(r"\bIon\b", ion_line, line))
+
+
+
+rule pdb2gmx:
+    input:
+        f"{REPLICA}.pdb"
+    output:
+        gro="process.gro",
+        top="topol.top"
+    params:
+        forcefield=FORCEFIELD,
+        water_model=water_model,
+        param_dir=parameters
+    shell:
+        """
+        FORCEFIELD={params.forcefield}
+        export GMXLIB={params.param_dir}/{FORCEFIELD}
+
+
+        if [[ $FORCEFIELD == "CHARMM36M" || $FORCEFIELD == "AMBER99SB-DISP" ]]; then
+            sed -i.bak 's/HIP/HIS/g' {input}
+            echo 0 0 | gmx_mpi pdb2gmx -f {input} \
+                -o {output.gro} -p topol.top -ter -water {params.water_model} -ff ${{FORCEFIELD,,}} -ignh
+        else
+            gmx_mpi pdb2gmx -f {input} \
+                -o {output.gro} -p topol.top -water {params.water_model} -ff ${{FORCEFIELD,,}} -ignh
+        fi
+        """
+rule editconf:
+    input:
+        "process.gro"
+    output:
+        "newbox.gro"
+    params:
+        box_size = box_size
+    shell:
+        "gmx_mpi editconf -f {input} -o {output} -c -d {params.box_size} -bt dodecahedron"
+
+
+rule solvate:
+    input:
+        gro="newbox.gro",
+        top="topol.top"
+    output:
+        gro="solv.gro"
+    params:
+        path = SYSTEM_PATH,
+        forcefield=FORCEFIELD,
+        param_dir=parameters,
+        conc=CONC  # mol/L
+    shell:
+        """
+        export GMXLIB=$(dirname {params.param_dir})
+        FF={params.forcefield}
+        INPUT={input.gro}
+        OUTPUT={output.gro}
+        PARAM_DIR={params.param_dir}
+        CONC={params.conc}
+
+        # --- HPO4 special handling ---
+        if [[ {params.path} == *HPO4* ]]; then
+            V=$(gmx_mpi editconf -f "$INPUT" 2>&1 | grep "Volume" | awk '{{print $2}}')
+            echo $V
+            nmol=$(echo "scale=10; ($CONC * 6.022*10^23 * $V) / 10^24" | bc -l)
+            HPO4_nr=$(echo "scale=0; ($nmol+0.999999)/1" | bc)
+            gmx_mpi insert-molecules -f "$INPUT" \
+                -ci {params.param_dir}/$FF/${{FF,,}}.ff/HPO4.gro \
+                -nmol $HPO4_nr -o not_solvated_HPO4.gro
+
+            echo -e "HPO4    $HPO4_nr" >> topol.top
+            line=$(grep -n '^#include' topol.top | tail -n1 | cut -d: -f1)
+            sed -i "${{line}}a #include \\"$PARAM_DIR/$FF/${{FF,,}}.ff/HPO4.itp\\"" topol.top  
+            INPUT="not_solvated_HPO4.gro"
+        fi
+
+
+        # --- Solvation depending on forcefield ---
+        if [[ "$FF" == "AMBER03WS" || "$FF" == "AMBER99SBWS" ]]; then
+            gmx_mpi solvate -cp "$INPUT" \
+                -cs $PARAM_DIR/$FF/${{FF,,}}.ff/tip4p2005.gro \
+                -o "$OUTPUT" -p topol.top
+        elif [[ "$FF" == "AMBER99SB-DISP" ]]; then
+            gmx_mpi solvate -cp "$INPUT" \
+                -cs $PARAM_DIR/$FF/${{FF,,}}.ff/a99SBdisp_water.gro \
+                -o "$OUTPUT" -p topol.top
+        else
+            gmx_mpi solvate -cp "$INPUT" -cs tip4p.gro \
+                -o "$OUTPUT" -p topol.top
+        fi
+
+        # --- Fix topology water model names ---
+        if [[ "$FF" == "DESAMBER" ]]; then
+            sed -i 's/tip4p.itp/tip4pd.itp/' topol.top
+        elif [[ "$FF" == "AMBER03WS" || "$FF" == "AMBER99SBWS" ]]; then
+            sed -i 's/tip4p.itp/tip4p2005s.itp/' topol.top
+        elif [[ "$FF" == "AMBER99SB-DISP" ]]; then
+            sed -i 's/tip4p.itp/a99SBdisp_water.itp/' topol.top
+        fi
+        """
+
+rule add_ions:
+    input:
+        gro="solv.gro"
+    output:
+        gro="solv_ions.gro"
+    params:
+        param_dir=parameters,
+        forcefield=FORCEFIELD,
+        pos_ion=POS_ION,
+        pos_q=POS_Q,
+        neg_ion=NEG_ION,
+        neg_q=NEG_Q,
+        conc=CONC
+    shell:
+        """
+        
+        export GMXLIB=$(dirname {params.param_dir})
+        # Bash variables
+        FF={params.forcefield}
+        INPUT={input.gro}
+        OUTPUT={output.gro}
+        POS_ION="{params.pos_ion}"
+        NEG_ION="{params.neg_ion}"
+        POS_Q={params.pos_q}
+        NEG_Q={params.neg_q}
+        CONC={params.conc}
+
+
+        # Map CHARMM36M ion names
+        if [[ "$FF" == "CHARMM36M" ]]; then
+            [[ "$POS_ION" == "NA" ]] && POS_ION="SOD"
+            [[ "$POS_ION" == "CA" ]] && POS_ION="CAL"
+            [[ "$NEG_ION" == "CL" ]] && NEG_ION="CLA"
+        fi
+
+        echo "Positive ion: $POS_ION, Negative ion: $NEG_ION, Forcefield: $FF"
+
+        # Generate tpr
+        gmx_mpi grompp -f {params.param_dir}/"$FF"/ions.mdp \
+            -c "$INPUT" -p topol.top -o ions.tpr -maxwarn 1
+
+        # Add ions
+        if [[ f"{SYSTEM_PATH}/$INPUT" == *HPO4* ]]; then
+            if [[ "$FF" == "CHARMM36M" ]]; then
+                NEG_ION=CLA
+            else
+	        NEG_ION=CL
+            fi
+            echo "HPO4 special case: calculating charge-based K+"
+            echo SOL | gmx_mpi genion -s ions.tpr -o {output.gro} -p topol.top \
+            -pname K -pq 1 -nname "$NEG_ION" -nq -1 -neutral
+        else
+            echo SOL | gmx_mpi genion -s ions.tpr -o {output.gro} -p topol.top \
+                -pname "$POS_ION" -pq $POS_Q \
+                -nname "$NEG_ION" -nq $NEG_Q \
+                -neutral -conc $CONC
+        fi
+        """
+
+
+rule energy_minimization:
+    input:
+        gro="solv_ions.gro",
+        mdp="em.mdp"
+    output:
+        tpr="em.tpr",
+        gro="em.gro"
+    params:
+        param_dir=parameters,
+        forcefield=FORCEFIELD
+    shell:
+        r"""
+        export GMXLIB=$(dirname {params.param_dir})
+        gmx_mpi grompp -f {input.mdp} -c {input.gro} -p topol.top -o {output.tpr} -maxwarn 1
+        gmx_mpi mdrun -deffnm em
+        """
+rule nvt_equilibration:
+    input:
+        gro="em.gro",
+        mdp="nvt.mdp"
+    output:
+        tpr="nvt.tpr",
+        gro="nvt.gro"
+    params:
+        param_dir=parameters,
+        forcefield=FORCEFIELD
+    shell:
+        r"""
+        export GMXLIB=$(dirname {params.param_dir})
+        gmx_mpi grompp -f {input.mdp} -c {input.gro} -r {input.gro} -p topol.top -o {output.tpr} -maxwarn 1
+        srun gmx_mpi mdrun -deffnm nvt -cpi nvt.cpt
+        """
+
+rule npt_equilibration:
+    input:
+        gro="nvt.gro",
+        mdp="npt.mdp"
+    output:
+        tpr="npt.tpr",
+        gro="npt.gro"
+    params:
+        param_dir=parameters,
+        forcefield=FORCEFIELD
+    shell:
+        r"""
+        export GMXLIB=$(dirname {params.param_dir})
+        gmx_mpi grompp -f {input.mdp} -c {input.gro} -r {input.gro} -p topol.top -o {output.tpr} -maxwarn 1
+        srun gmx_mpi mdrun -deffnm npt -cpi npt.cpt
+        """
+rule create_mdrun:
+    input:
+        gro="npt.gro",
+        mdp=f"md_{SIM_TIME}ns.mdp"
+    output:
+        tpr=f"md_{SIM_TIME}ns.tpr"
+    params:
+        param_dir=parameters,
+        forcefield=FORCEFIELD
+    shell:
+        r"""
+        export GMXLIB=$(dirname {params.param_dir})
+        gmx_mpi grompp -f {input.mdp} -c {input.gro} -t npt.cpt -p topol.top -o {output.tpr} -maxwarn 1
+        """
+
+

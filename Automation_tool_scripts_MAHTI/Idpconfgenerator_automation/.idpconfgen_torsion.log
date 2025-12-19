@@ -1,0 +1,8 @@
+[2025-11-26 13:32:00,898]Reading Input Paths:
+[2025-11-26 13:32:00,962]    done
+[2025-11-26 13:32:02,449]    saved ERROR REPORT: /home/cmcajsa/Documents/PhD_december2024/sa_discos/Automation_tool_scripts_MAHTI/Idpconfgenerator_automation/torsions_7444069822991864928_1764156722448479901.rpr_on_crash
+[2025-11-26 13:32:02,798]    saved ERROR REPORT: /home/cmcajsa/Documents/PhD_december2024/sa_discos/Automation_tool_scripts_MAHTI/Idpconfgenerator_automation/torsions_7209161055765918959_1764156722797690103.rpr_on_crash
+[2025-11-26 13:32:39,226]    saved ERROR REPORT: /home/cmcajsa/Documents/PhD_december2024/sa_discos/Automation_tool_scripts_MAHTI/Idpconfgenerator_automation/torsions_6854199697478650492_1764156759210251172.rpr_on_crash
+[2025-11-26 13:32:46,939]    Removing {'1MN8_A_seg0', '1LMI_A_seg0', '6SXT_A_seg0'} from the dictionary.
+
+[2025-11-26 13:32:48,151]    finished properly

@@ -1,0 +1,45 @@
+; Forcefield A99
+; Water model TIP4PD [1]
+; [1] Piana S, Donchev AG, Robustelli P, Shaw DE. Water dispersion interactions strongly influence simulated structural properties of disordered protein states. J Phys Chem B. 2015 Apr 23;119(16):5113-23. doi: 10.1021/jp508971m. Epub 2015 Apr 13. PMID: 25764013.
+
+
+; moleculetype was changed from WAT to SOL in order to match GROMACS nomenclature
+[ moleculetype ]
+; Name            nrexcl
+SOL          3
+
+; atom names were changed (O -> OW, H1 -> HW1, H2 -> HW2, EPW -> MW) in order to match GROMACS nomenclature
+[ atoms ]
+;   nr       type  resnr residue  atom   cgnr    charge       mass  typeB    chargeB      massB
+; residue    1 SOL rtp SOL q 0.0
+    1         OW      1    SOL     OW      1 0.00000000  16.000000   ; qtot 0.000000
+    2         HW      1    SOL    HW1      2 0.58000000   1.008000   ; qtot 0.580000
+    3         HW      1    SOL    HW2      3 0.58000000   1.008000   ; qtot 1.160000
+    4         MW      1    SOL     MW      4 -1.16000000   0.000000   ; qtot 0.000000
+
+#ifdef FLEXIBLE
+
+[ bonds ]
+;    ai     aj funct         c0         c1         c2         c3
+      2      1     1   0.09572 462750.400000
+      3      1     1   0.09572 462750.400000
+      3      2     1   0.15136 462750.400000
+
+
+#else
+
+[ settles ]
+; i     funct   doh     dhh
+1     1   0.09572000   0.15136000
+
+#endif
+
+[ virtual_sites3 ]
+; Site  from                   funct
+4     1    2    3    1      0.131894  0.131894
+
+[ exclusions ]
+1  2  3  4
+2  1  3  4
+3  1  2  4
+

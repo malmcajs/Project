@@ -1,0 +1,96 @@
+
+[ moleculetype ]
+;name            nrexcl
+ HPO4              3
+
+
+; Parameters for OZ, P, OX were taken from the description of a phosphoserine SEP with forcefield AmberFF99SB_ILDN after translation in Gromacs
+; Parameters for HO were taken from the description of a protonated phosphoserine SP1 with forcefield AmberFF99SB_ILDN after translation in Gromacs
+
+; The total of partial charges of P-OX-OX-OX is -1.561771
+; OZ has a charge of -0.43034300
+; HO has a charge of 0.42710100
+; we therefore decided to change the charge of HO to 0.1000000
+; The total of partial charges of the whole system becomes -1.892114
+; We place the remaining -0.107886 on OZ, bringing its charge to -0.538229
+
+
+[ atoms ]
+;   nr       type  resnr residue  atom   cgnr    charge       mass  typeB    chargeB      massB
+; residue   1 HPO4  rtp HPO4 q -2.000000
+ 
+     1         HO      1   HPO4    H1P      1    0.10000000   1.008000   ; qtot  0.10000
+     2         OZ      1   HPO4     OG      5   -0.45059000  16.000000   ; qtot -0.35059
+     3          P      1   HPO4      P      6    1.10967000  30.970000   ; qtot  0.75908  
+     4         OX      1   HPO4    O1P      7   -0.78636000  16.000000   ; qtot -0.02728
+     5         OX      1   HPO4    O2P      8   -0.78636000  16.000000   ; qtot -0.81364
+     6         OX      1   HPO4    O3P      9   -0.78636000  16.000000   ; qtot -1.60000
+
+
+
+
+; Equivalent bonds
+; H1P - OG  is equivalent to  22-25  in the 0_protonated_phosphoserine_A99.top            ->      22     25     1   0.09600 462750.400000
+;  OG - P   is equivalent to 211-212 (OZ and  P atoms in the phosphorylation at SEP12)    ->     211    212     1   0.16100 192464.000000
+;   P - O1P is equivalent to 212-213 ( P and OX atoms in the phosphorylation at SEP12)    ->     212    213     1   0.14800 439320.000000
+;   P - O2P is equivalent to 212-213 ( P and OX atoms in the phosphorylation at SEP12)    ->     212    213     1   0.14800 439320.000000
+;   P - O3P is equivalent to 212-213 ( P and OX atoms in the phosphorylation at SEP12)    ->     212    213     1   0.14800 439320.000000
+
+
+[ bonds ]
+;  ai    aj funct      r             k
+    1     2     1    0.09600   462750.400000       ;   HP1 - OG
+    2     3     1    0.16100   192464.000000       ;    OG - P
+    3     4     1    0.14800   439320.000000       ;     P - O1P
+    3     5     1    0.14800   439320.000000       ;     P - O2P
+    3     6     1    0.14800   439320.000000       ;     P - O3P
+
+
+
+
+
+[ pairs ]
+;  there are no pairs, the molecule is too small
+
+
+
+
+; Equivalent angles
+; H1P - OG - P   can be considered equivalent to 25-22-21 in the 0_protonated_phosphoserine_A99.top    ->     21     22     25     1   113.2800483 836.800000
+;  OG -  P - O1P is equivalent to 211-212-213 (OZ,  P and OX atoms in the phosphorylation at SEP12)    ->    211    212    213     1   108.2300464 836.800000
+;  OG -  P - O2P is equivalent to 211-212-213 (OZ,  P and OX atoms in the phosphorylation at SEP12)    ->    211    212    213     1   108.2300464 836.800000
+;  OG -  P - O3P is equivalent to 211-212-213 (OZ,  P and OX atoms in the phosphorylation at SEP12)    ->    211    212    213     1   108.2300464 836.800000
+; O1P -  P - O2P is equivalent to 213-212-214 (OX,  P and OX atoms in the phosphorylation at SEP12)    ->    213    212    214     1   119.9000514 1171.520000
+; O1P -  P - O3P is equivalent to 213-212-214 (OX,  P and OX atoms in the phosphorylation at SEP12)    ->    213    212    214     1   119.9000514 1171.520000
+; O2P -  P - O3P is equivalent to 213-212-214 (OX,  P and OX atoms in the phosphorylation at SEP12)    ->    213    212    214     1   119.9000514 1171.520000
+
+[ angles ]
+;   ai     aj     ak    funct   theta         cth
+    1      2      3     1     113.2800483   836.800000    ;   H1P - OG - P
+    2      3      4     1     108.2300464   836.800000    ;    OG -  P - O1P
+    2      3      5     1     108.2300464   836.800000    ;    OG -  P - O2P
+    2      3      6     1     108.2300464   836.800000    ;    OG -  P - O3P
+    4      3      5     1     119.9000514   1171.520000   ;   O1P -  P - O2P
+    4      3      6     1     119.9000514   1171.520000   ;   O1P -  P - O3P
+    5      3      6     1     119.9000514   1171.520000   ;   O2P -  P - O3P
+
+
+
+; In order to make the comparison with a phosphoserine, we try to reproduce the steric block of the base of the sidechain with the hydrogen
+; This means that we try to position the hydrogen where the sidechain would be through the dihedral angles
+
+; Equivalent proper dihedrals
+;   C - OG -  P - O1P is equivalent to 208-211-212-213 (BS, OZ, P and OX atoms in the phosphorylation at SEP12)    ->    208    211    212    213     1  0.0000000  1.0460000  3
+;   C - OG -  P - O2P is equivalent to 208-211-212-213 (BS, OZ, P and OX atoms in the phosphorylation at SEP12)    ->    208    211    212    213     1  0.0000000  1.0460000  3
+;   C - OG -  P - O3P is equivalent to 208-211-212-213 (BS, OZ, P and OX atoms in the phosphorylation at SEP12)    ->    208    211    212    213     1  0.0000000  1.0460000  3
+
+
+[ dihedrals ] ; propers
+;    i      j      k      l   func    C0         C1    
+     1      2      3      4     1  0.0000000  1.0460000  3
+     1      2      3      5     1  0.0000000  1.0460000  3
+     1      2      3      6     1  0.0000000  1.0460000  3
+
+
+
+; We consider that there are no improper dihedrals

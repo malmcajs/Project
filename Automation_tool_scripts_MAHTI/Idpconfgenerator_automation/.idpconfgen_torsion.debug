@@ -1,0 +1,26 @@
+[2025-11-26 13:32:00,898]cli_torsions.py:idpconfgen:main:149: Reading Input Paths:
+[2025-11-26 13:32:00,962]cli_torsions.py:idpconfgen:main:151:     done
+[2025-11-26 13:32:02,424]exceptions.py:idpconfgen:__init__:58: Exception errors: Chain is broken. Found distance above 2.1A for consecutive atoms.
+[2025-11-26 13:32:02,424]exceptions.py:idpconfgen:__init__:59: Exception args: ()
+[2025-11-26 13:32:02,449]logger.py:idpconfgen:report_on_crash:138:     saved ERROR REPORT: /home/cmcajsa/Documents/PhD_december2024/sa_discos/Automation_tool_scripts_MAHTI/Idpconfgenerator_automation/torsions_7444069822991864928_1764156722448479901.rpr_on_crash
+[2025-11-26 13:32:02,456]exceptions.py:idpconfgen:__init__:58: Exception errors: Crash reported to {}.
+[2025-11-26 13:32:02,456]exceptions.py:idpconfgen:__init__:59: Exception args: (PosixPath('/home/cmcajsa/Documents/PhD_december2024/sa_discos/Automation_tool_scripts_MAHTI/Idpconfgenerator_automation/torsions_7444069822991864928_1764156722448479901.rpr_on_crash'),)
+[2025-11-26 13:32:02,468]exceptions.py:idpconfgen:__init__:58: Exception errors: Crash reported to {}.
+[2025-11-26 13:32:02,469]exceptions.py:idpconfgen:__init__:59: Exception args: (PosixPath('/home/cmcajsa/Documents/PhD_december2024/sa_discos/Automation_tool_scripts_MAHTI/Idpconfgenerator_automation/torsions_7444069822991864928_1764156722448479901.rpr_on_crash'),)
+[2025-11-26 13:32:02,760]exceptions.py:idpconfgen:__init__:58: Exception errors: Chain is broken. Found distance above 2.1A for consecutive atoms.
+[2025-11-26 13:32:02,760]exceptions.py:idpconfgen:__init__:59: Exception args: ()
+[2025-11-26 13:32:02,798]logger.py:idpconfgen:report_on_crash:138:     saved ERROR REPORT: /home/cmcajsa/Documents/PhD_december2024/sa_discos/Automation_tool_scripts_MAHTI/Idpconfgenerator_automation/torsions_7209161055765918959_1764156722797690103.rpr_on_crash
+[2025-11-26 13:32:02,806]exceptions.py:idpconfgen:__init__:58: Exception errors: Crash reported to {}.
+[2025-11-26 13:32:02,806]exceptions.py:idpconfgen:__init__:59: Exception args: (PosixPath('/home/cmcajsa/Documents/PhD_december2024/sa_discos/Automation_tool_scripts_MAHTI/Idpconfgenerator_automation/torsions_7209161055765918959_1764156722797690103.rpr_on_crash'),)
+[2025-11-26 13:32:02,807]exceptions.py:idpconfgen:__init__:58: Exception errors: Crash reported to {}.
+[2025-11-26 13:32:02,807]exceptions.py:idpconfgen:__init__:59: Exception args: (PosixPath('/home/cmcajsa/Documents/PhD_december2024/sa_discos/Automation_tool_scripts_MAHTI/Idpconfgenerator_automation/torsions_7209161055765918959_1764156722797690103.rpr_on_crash'),)
+[2025-11-26 13:32:39,188]exceptions.py:idpconfgen:__init__:58: Exception errors: Chain is broken. Found distance above 2.1A for consecutive atoms.
+[2025-11-26 13:32:39,197]exceptions.py:idpconfgen:__init__:59: Exception args: ()
+[2025-11-26 13:32:39,226]logger.py:idpconfgen:report_on_crash:138:     saved ERROR REPORT: /home/cmcajsa/Documents/PhD_december2024/sa_discos/Automation_tool_scripts_MAHTI/Idpconfgenerator_automation/torsions_6854199697478650492_1764156759210251172.rpr_on_crash
+[2025-11-26 13:32:39,230]exceptions.py:idpconfgen:__init__:58: Exception errors: Crash reported to {}.
+[2025-11-26 13:32:39,232]exceptions.py:idpconfgen:__init__:59: Exception args: (PosixPath('/home/cmcajsa/Documents/PhD_december2024/sa_discos/Automation_tool_scripts_MAHTI/Idpconfgenerator_automation/torsions_6854199697478650492_1764156759210251172.rpr_on_crash'),)
+[2025-11-26 13:32:39,234]exceptions.py:idpconfgen:__init__:58: Exception errors: Crash reported to {}.
+[2025-11-26 13:32:39,235]exceptions.py:idpconfgen:__init__:59: Exception args: (PosixPath('/home/cmcajsa/Documents/PhD_december2024/sa_discos/Automation_tool_scripts_MAHTI/Idpconfgenerator_automation/torsions_6854199697478650492_1764156759210251172.rpr_on_crash'),)
+[2025-11-26 13:32:46,939]libparse.py:idpconfgen:pop_difference_with_log:303:     Removing {'1MN8_A_seg0', '1LMI_A_seg0', '6SXT_A_seg0'} from the dictionary.
+
+[2025-11-26 13:32:48,151]cli.py:idpconfgen:maincli:143:     finished properly

@@ -1,0 +1,103 @@
+
+[ moleculetype ]
+;name            nrexcl
+ HPO4              3
+
+
+; Parameters for ON2, P, ON3 were taken from the description of a phosphoserine SP2 with forcefield CHARMM36m after creation with Gromacs
+; Parameters for HN4 were taken from the description of a protonated phosphoserine SP1 with forcefield CHARMM36m 
+
+; The total of partial charges of P-ON3-ON3-ON3 is -1.6
+; ON2 has a charge of -0.4
+; HN4 has a charge of 0.34
+; we therefore decided to change the charge of HN4 to 0.1
+; The total of partial charges of the whole system becomes -1.9
+; We place the remaining -0.1 on ON2, bringing its charge to -0.5
+
+; We then apply the ECC correction, applying a factor 0.8 to the non-protonated oxygens and the phosphate
+
+[ atoms ]
+;   nr       type  resnr residue  atom   cgnr     charge       mass  typeB    chargeB      massB
+; residue 1 HPO4 rtp HPO4  q -2
+
+
+     1        HN4      1   HPO4     HT      1        0.1     12.011   ; qtot  0.10
+     2        ON2      1   HPO4     OG      1      -0.42    15.9994   ; qtot -0.32
+     3          P      1   HPO4      P      1       0.88     30.974   ; qtot  0.56
+     4        ON3      1   HPO4    O1P      1      -0.72    15.9994   ; qtot -0.16
+     5        ON3      1   HPO4    O2P      1      -0.72    15.9994   ; qtot -0.88
+     6        ON3      1   HPO4    O3P      1      -0.72    15.9994   ; qtot -1.60
+
+
+
+
+
+; Equivalent bonds in ffbonded.itp of charmm36-jul2022.ff 
+; HN4 - ON2 does not exist, so we treat ON2 as ON4 in this particular case (similar to protonated methylphosphate)   ->     HN4      ON4     1   0.09600000    456056.00 ; MP_1, ADM Jr. 
+; ON2 -   P   can be found in ffbonded.itp of charmm36-jul2022.ff   ->     ON2        P     1   0.16000000    225936.00 ; DMP, ADM Jr.
+;   P -   ON3 can be found in ffbonded.itp of charmm36-jul2022.ff   ->     ON3        P     1   0.14800000    485344.00 ; DMP, ADM Jr.
+;   P -   ON3 can be found in ffbonded.itp of charmm36-jul2022.ff   ->     ON3        P     1   0.14800000    485344.00 ; DMP, ADM Jr.
+;   P -   ON3 can be found in ffbonded.itp of charmm36-jul2022.ff   ->     ON3        P     1   0.14800000    485344.00 ; DMP, ADM Jr.
+
+
+[ bonds ]
+;  ai    aj funct      r             k
+    1     2     1    0.09600000   456056.00       ;    HT - OG
+    2     3     1    0.16000000   225936.00       ;    OG - P
+    3     4     1    0.14800000   485344.00       ;     P - O1P
+    3     5     1    0.14800000   485344.00       ;     P - O2P
+    3     6     1    0.14800000   485344.00       ;     P - O3P
+
+
+
+
+
+[ pairs ]
+;  there are no pairs, the molecule is too small
+
+
+
+
+
+; Equivalent angles in ffbonded.itp of charmm36-jul2022.ff
+; HN4 -  ON2 -   P does not exist, so we treat ON2 as ON4 in this particular case (similar to protonated methylphosphate)   ->        HN4      ON4        P     5   115.000000   251.040000   0.23500000     33472.00 ; MP_1, ADM Jr.
+; ON2 -    P - ON3 can be found in ffbonded.itp of charmm36-jul2022.ff   ->     ON2        P      ON3     5   111.600000   827.595200   0.00000000         0.00 ; DMP, adm jr.
+; ON2 -    P - ON3 can be found in ffbonded.itp of charmm36-jul2022.ff   ->     ON2        P      ON3     5   111.600000   827.595200   0.00000000         0.00 ; DMP, adm jr.
+; ON2 -    P - ON3 can be found in ffbonded.itp of charmm36-jul2022.ff   ->     ON2        P      ON3     5   111.600000   827.595200   0.00000000         0.00 ; DMP, adm jr.
+; ON3 -    P - ON3 can be found in ffbonded.itp of charmm36-jul2022.ff   ->     ON3        P      ON3     5   120.000000  1004.160000   0.00000000         0.00 ; DMP, adm jr.
+; ON3 -    P - ON3 can be found in ffbonded.itp of charmm36-jul2022.ff   ->     ON3        P      ON3     5   120.000000  1004.160000   0.00000000         0.00 ; DMP, adm jr.
+; ON3 -    P - ON3 can be found in ffbonded.itp of charmm36-jul2022.ff   ->     ON3        P      ON3     5   120.000000  1004.160000   0.00000000         0.00 ; DMP, adm jr.
+
+
+[ angles ]
+;   ai     aj     ak    funct   theta         cth
+    1      2      3     5     115.000000    251.040000   0.23500000     33472.00    ;    HT - OG - P
+    2      3      4     5     111.600000    827.595200   0.00000000         0.00    ;    OG -  P - O1P
+    2      3      5     5     111.600000    827.595200   0.00000000         0.00    ;    OG -  P - O2P
+    2      3      6     5     111.600000    827.595200   0.00000000         0.00    ;    OG -  P - O3P
+    4      3      5     5     120.000000   1004.160000   0.00000000         0.00    ;   O1P -  P - O2P
+    4      3      6     5     120.000000   1004.160000   0.00000000         0.00    ;   O1P -  P - O3P
+    5      3      6     5     120.000000   1004.160000   0.00000000         0.00    ;   O2P -  P - O3P
+
+
+
+
+; In order to make the comparison with a phosphoserine, we try to reproduce the steric block of the base of the sidechain with the hydrogen
+; This means that we try to position the hydrogen where the sidechain would be through the dihedral angles
+
+
+; Equivalent proper dihedrals in ffbonded.itp of charmm36-jul2022.ff
+; In the phosphoserine, the dihedral C-OG-P-O1P is made of atom types CT2-ON2-P-ON3. We therefore conserve the dihedral associated :      CT2      ON2        P      ON3     9     0.000000     0.418400     3 ; from ON3  P    ON2  CN8B
+; In the phosphoserine, the dihedral C-OG-P-O1P is made of atom types CT2-ON2-P-ON3. We therefore conserve the dihedral associated :      CT2      ON2        P      ON3     9     0.000000     0.418400     3 ; from ON3  P    ON2  CN8B
+; In the phosphoserine, the dihedral C-OG-P-O1P is made of atom types CT2-ON2-P-ON3. We therefore conserve the dihedral associated :      CT2      ON2        P      ON3     9     0.000000     0.418400     3 ; from ON3  P    ON2  CN8B
+
+
+[ dihedrals ] ; propers
+;    i      j      k      l   func    phi0       kphi     mult
+     1      2      3      4     9   0.000000   0.418400     3
+     1      2      3      5     9   0.000000   0.418400     3
+     1      2      3      6     9   0.000000   0.418400     3
+
+
+
+; We consider that there are no improper dihedrals

@@ -1,0 +1,31 @@
+[2025-11-26 13:32:49,746]Starting The Building Process:
+[2025-11-26 13:32:49,746]    input sequence: GRGGLGGQGAGAAAAAGGAGQGGYGGLSQGTSGRGGLGGQGAGAAAAAGGAGQGGYGGLSQGTSGRGGLGGQGAGAAAAAGGAGQGGYGGLSQGTS
+[2025-11-26 13:32:49,746]running in 1 cores with 0 remaining confs
+[2025-11-26 13:32:49,746]Fragment Size And Probabilities Selected:
+[2025-11-26 13:32:49,746]    sizes of: (1, 2, 3, 4, 5)
+[2025-11-26 13:32:49,746]    probs of: (0.1, 0.1, 0.3, 0.3, 0.2)
+[2025-11-26 13:32:50,037]preparing regex xmers
+[2025-11-26 13:32:50,037]    searching database with DSSP regexes: ([E]+)
+[2025-11-26 13:32:51,756]Corrected Fragment Selection Probabilities:
+[2025-11-26 13:32:51,756]    sizes of: (1, 2, 3, 4, 5)
+[2025-11-26 13:32:51,756]    probs of: (0.1, 0.1, 0.3, 0.3, 0.2)
+[2025-11-26 13:32:58,479]    Lennard-Jones type configured to: 'pairs'
+[2025-11-26 13:32:58,480]prepared lj
+[2025-11-26 13:32:58,480]done preparing energy func
+[2025-11-26 13:32:59,287]    Lennard-Jones type configured to: 'pairs'
+[2025-11-26 13:32:59,287]prepared lj
+[2025-11-26 13:32:59,287]done preparing energy func
+[2025-11-26 13:32:59,307]random seed: 0
+[2025-11-26 13:32:59,308]    configuring sidechain method: faspr
+[2025-11-26 13:33:05,773]seed 0 - finished conf: 1 with energy -446.8369047471166
+[2025-11-26 13:33:05,928]seed 0 - finished conf: 2 with energy -391.19295663521206
+[2025-11-26 13:33:06,089]seed 0 - finished conf: 3 with energy -433.2333255674302
+[2025-11-26 13:33:06,242]seed 0 - finished conf: 4 with energy -407.5724512456452
+[2025-11-26 13:33:06,401]seed 0 - finished conf: 5 with energy -433.4927012550398
+[2025-11-26 13:33:06,551]seed 0 - finished conf: 6 with energy -385.01509524438495
+[2025-11-26 13:33:06,726]seed 0 - finished conf: 7 with energy -470.86395934548295
+[2025-11-26 13:33:06,901]seed 0 - finished conf: 8 with energy -334.254861491641
+[2025-11-26 13:33:07,781]seed 0 - finished conf: 9 with energy -426.3961150833296
+[2025-11-26 13:33:07,942]seed 0 - finished conf: 10 with energy -426.9112811846876
+[2025-11-26 13:33:07,975]10 conformers built in 8.687 seconds
+[2025-11-26 13:33:07,975]    finished properly
