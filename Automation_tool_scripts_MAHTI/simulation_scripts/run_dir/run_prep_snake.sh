@@ -5,8 +5,8 @@
 #SBATCH --nodes=4
 ##SBATCH --ntasks=128
 ##SBATCH --cpus-per-task=1
-#SBATCH --array=0-9
-#SBATCH --account=project_2003809	
+#SBATCH --array=0-24
+#SBATCH --account=project	
 #SBATCH --output=job_output_%A_%a.log
 #SBATCH --error=job_error_%A_%a.log
 
@@ -15,7 +15,7 @@
 module load snakemake
 module load gromacs-env
 
-PROT_NAME="P19837_3reps_3mer_noIons"
+PROT_NAME="SYSTEM"
 cd ../..
 
 BASE_DIR=${PWD}
@@ -39,8 +39,7 @@ read choice
 project=${list[choice-1]}
 
 
-#FORCEFIELD=(AMBER03WS AMBER99SB-DISP AMBER99SBWS CHARMM36M DESAMBER)
-FORCEFIELD=(DESAMBER)
+FORCEFIELD=(AMBER03WS AMBER99SB-DISP AMBER99SBWS DESAMBER)
 
 for pdb_file in $BASE_DIR/$PROT_NAME/rep*.pdb; do
 	directory_path="${pdb_file%/*}"
@@ -52,7 +51,12 @@ for pdb_file in $BASE_DIR/$PROT_NAME/rep*.pdb; do
 done
 
 
-PROT_FOLDERS=($(ls -d ${BASE_DIR}/${PROT_NAME}/*/*/))
+
+PROT_FOLDERS=()
+
+for ff in "${FORCEFIELD[@]}"; do
+    PROT_FOLDERS+=($(ls -d "${BASE_DIR}/${PROT_NAME}"/*/"${ff}"/ 2>/dev/null))
+done
 
 
 cd ${PROT_FOLDERS[${SLURM_ARRAY_TASK_ID}]} || {
@@ -63,4 +67,4 @@ cd ${PROT_FOLDERS[${SLURM_ARRAY_TASK_ID}]} || {
 echo "=== Job ${SLURM_ARRAY_TASK_ID} running in $(pwd) ==="
 
 
-snakemake -s ${SNAKEFILE} --cores $SLURM_NTASKS --keep-going --rerun-incomplete 
+snakemake -s ${SNAKEFILE} --cores $SLURM_NTASKS
